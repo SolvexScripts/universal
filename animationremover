@@ -1,0 +1,169 @@
+-- Animation Remover by @wbujayden (FINAL - Clean Top-Left Title + Credit Below)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local connection
+local isNoAnims = false
+
+local function stopAllTracks(humanoid)
+    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop(0)
+    end
+end
+
+local function setupCharacter(char)
+    local humanoid = char:WaitForChild("Humanoid", 10)
+    if not humanoid then return end
+    if connection then connection:Disconnect() end
+    connection = RunService.Heartbeat:Connect(function()
+        if isNoAnims then stopAllTracks(humanoid) end
+    end)
+end
+
+task.wait(0.1)
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "JaydensAnimRemover"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 999999
+screenGui.Parent = player.PlayerGui
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 280, 0, 190)
+mainFrame.Position = UDim2.new(0.5, -140, 0.5, -95)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = mainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(0, 170, 255)
+stroke.Thickness = 2.5
+stroke.Parent = mainFrame
+
+-- "Animation Remover" - BOLD & Top-Left
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0, 220, 0, 30)
+title.Position = UDim2.new(0, 18, 0, 14)
+title.BackgroundTransparency = 1
+title.Text = "Animation Remover"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold   -- BOLD
+title.TextSize = 22
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = mainFrame
+
+-- Tiny credit DIRECTLY BELOW the title
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.new(0, 220, 0, 20)
+credit.Position = UDim2.new(0, 18, 0, 40)  -- Right under title
+credit.BackgroundTransparency = 1
+credit.Text = "Created By @wbujayden on TikTok!"
+credit.TextColor3 = Color3.fromRGB(130, 140, 160)
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 13
+credit.TextXAlignment = Enum.TextXAlignment.Left
+credit.Parent = mainFrame
+
+-- Main Toggle Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, -30, 0, 60)
+button.Position = UDim2.new(0, 15, 0, 110)
+button.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+button.Text = "Remove Animations"
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.GothamBold
+button.TextSize = 19
+button.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 12)
+btnCorner.Parent = button
+
+local btnStroke = Instance.new("UIStroke")
+btnStroke.Color = Color3.fromRGB(60, 60, 70)
+btnStroke.Thickness = 1.5
+btnStroke.Parent = button
+
+-- Minimize Button (−)
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 36, 0, 36)
+minimizeBtn.Position = UDim2.new(1, -48, 0, 12)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+minimizeBtn.Text = "−"
+minimizeBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.TextSize = 32
+minimizeBtn.Parent = mainFrame
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 18)
+minCorner.Parent = minimizeBtn
+
+local minStroke = Instance.new("UIStroke")
+minStroke.Color = Color3.fromRGB(0, 170, 255)
+minStroke.Thickness = 2
+minStroke.Parent = minimizeBtn
+
+-- Minimized Circle
+local miniCircle = Instance.new("TextButton")
+miniCircle.Size = UDim2.new(0, 60, 0, 60)
+miniCircle.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+miniCircle.Text = "AR"
+miniCircle.TextColor3 = Color3.fromRGB(255, 255, 255)
+miniCircle.Font = Enum.Font.GothamBold
+miniCircle.TextSize = 26
+miniCircle.Visible = false
+miniCircle.Active = true
+miniCircle.Draggable = true
+miniCircle.Parent = screenGui
+
+local circleCorner = Instance.new("UICorner")
+circleCorner.CornerRadius = UDim.new(0, 30)
+circleCorner.Parent = miniCircle
+
+local circleStroke = Instance.new("UIStroke")
+circleStroke.Color = Color3.fromRGB(0, 170, 255)
+circleStroke.Thickness = 3
+circleStroke.Parent = miniCircle
+
+-- Toggle Animation Removal
+button.MouseButton1Click:Connect(function()
+    isNoAnims = not isNoAnims
+    if isNoAnims then
+        button.Text = "Restore Animations"
+        button.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+        btnStroke.Color = Color3.fromRGB(0, 170, 255)
+    else
+        button.Text = "Remove Animations"
+        button.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        btnStroke.Color = Color3.fromRGB(60, 60, 70)
+    end
+end)
+
+-- Minimize / Restore
+minimizeBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    miniCircle.Visible = true
+    miniCircle.Position = mainFrame.Position
+end)
+
+miniCircle.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    miniCircle.Visible = false
+    mainFrame.Position = miniCircle.Position
+end)
+
+-- Character Setup
+player.CharacterAdded:Connect(setupCharacter)
+if player.Character then setupCharacter(player.Character) end
+
+print("Animation Remover by @wbujayden LOADED!")
